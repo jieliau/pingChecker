@@ -1,4 +1,4 @@
-#Ping Checker
+# Ping Checker
 
 You have to specify the file which contains ip addresses you wanna ping, each ip per line.
 ```
