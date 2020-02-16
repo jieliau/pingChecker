@@ -2,6 +2,7 @@ import getopt
 import sys
 import platform
 import subprocess
+import threading
 
 def usage():
     print(
@@ -39,7 +40,11 @@ def ping(host):
     '''
     param = '-n' if platform.system().lower() == 'windows' else '-c'
     command = ['ping', param, '1', host]
-    return subprocess.call(command, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w')) == 0
+    if subprocess.call(command, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w')) == 0:
+        print(host.strip("\n") + "\tis ok")
+    else:
+        print(host.strip("\n") + "\tis unreachable")
+    #return subprocess.call(command, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w')) == 0
 
 def main():
     ips = list()
@@ -48,8 +53,16 @@ def main():
         ips.append(line)
     fp.close()
 
-    for ip in ips:
-        print(ip.strip('\n') + "\tis unreachable") if ping(ip) == 0 else print(ip.strip('\n') + "\tis ok")
+    threads = list()
+    for i in range(len(ips)):
+        threads.append(threading.Thread(target = ping, args = (ips[i], )))
+        threads[i].start()
+    for i in range(len(ips)):
+        threads[i].join()
+    
+    #for ip in ips:
+    #    ping(ip)
+    #    print(ip.strip('\n') + "\tis unreachable") if ping(ip) == 0 else print(ip.strip('\n') + "\tis ok")
 
 if __name__ == '__main__':
     main()
