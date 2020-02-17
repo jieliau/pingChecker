@@ -3,6 +3,7 @@ import sys
 import platform
 import subprocess
 import threading
+import time
 
 def usage():
     print(
@@ -48,14 +49,16 @@ def ping(host):
 
 def main():
     ips = list()
-    fp = open(ipfile, 'r')
-    for line in iter(fp):
-        ips.append(line)
-    fp.close()
+    #fp = open(ipfile, 'r')
+    #for line in iter(fp):
+    #    ips.append(line)
+    #fp.close()
+    with open(ipfile, "r") as fp:
+        ips.append(fp.readlines())
 
     threads = list()
-    for i in range(len(ips)):
-        threads.append(threading.Thread(target = ping, args = (ips[i], )))
+    for i in range(len(ips[0])):
+        threads.append(threading.Thread(target = ping, args = (ips[0][i], )))
         threads[i].start()
     for i in range(len(ips)):
         threads[i].join()
